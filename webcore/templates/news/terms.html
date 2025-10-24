@@ -1,0 +1,68 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+{% block title %}Terms of Service - {{ site_name }}{% endblock %}
+{% block description %}Read our terms of service to understand your rights and responsibilities when using our website.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="fw-bold mb-4">Terms of Service</h1>
+            <p class="text-muted mb-4">Last updated: {% now "F d, Y" %}</p>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4 fw-bold mb-3">1. Acceptance of Terms</h2>
+                    <p>By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">2. Use License</h2>
+                    <p>Permission is granted to temporarily download one copy of the materials on our website for personal, non-commercial transitory viewing only.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">3. User Accounts</h2>
+                    <p>When you create an account with us, you must provide information that is accurate, complete, and current at all times.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">4. Content Guidelines</h2>
+                    <p>You agree not to post content that is:</p>
+                    <ul>
+                        <li>Illegal, harmful, or violates any laws</li>
+                        <li>Defamatory, abusive, or harassing</li>
+                        <li>Spam or unsolicited commercial content</li>
+                        <li>Infringing on intellectual property rights</li>
+                    </ul>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">5. Prohibited Uses</h2>
+                    <p>You may not use our website:</p>
+                    <ul>
+                        <li>For any unlawful purpose</li>
+                        <li>To transmit viruses or malicious code</li>
+                        <li>To interfere with the website's functionality</li>
+                        <li>To collect user information without permission</li>
+                    </ul>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">6. Intellectual Property</h2>
+                    <p>The content on this website, including text, graphics, logos, and images, is the property of {{ site_name }} and is protected by copyright laws.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">7. Disclaimer</h2>
+                    <p>The information on this website is provided on an "as is" basis. To the fullest extent permitted by law, we exclude all representations, warranties, and conditions.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">8. Limitation of Liability</h2>
+                    <p>In no event shall {{ site_name }} or its suppliers be liable for any damages arising out of the use or inability to use the materials on this website.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">9. Termination</h2>
+                    <p>We may terminate or suspend your account immediately, without prior notice, for conduct that we believe violates these Terms of Service.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">10. Changes to Terms</h2>
+                    <p>We reserve the right to modify these terms at any time. We will notify users of any changes by posting the new Terms of Service on this page.</p>
+                    
+                    <h2 class="h4 fw-bold mb-3 mt-4">11. Contact Information</h2>
+                    <p>If you have any questions about these Terms of Service, please contact us at <a href="mailto:legal@newswebsite.com">legal@newswebsite.com</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

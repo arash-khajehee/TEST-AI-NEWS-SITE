@@ -1,0 +1,244 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_description %}Overview of your news website{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-primary me-3">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">{{ total_articles }}</h3>
+                    <p class="text-muted mb-0">Total Articles</p>
+                    <small class="text-success">{{ published_articles }} published</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-success me-3">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">{{ total_comments }}</h3>
+                    <p class="text-muted mb-0">Total Comments</p>
+                    {% if pending_comments > 0 %}
+                    <small class="text-warning">{{ pending_comments }} pending</small>
+                    {% else %}
+                    <small class="text-success">All approved</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-info me-3">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">{{ total_users }}</h3>
+                    <p class="text-muted mb-0">Total Users</p>
+                    <small class="text-info">{{ newsletter_subscribers }} subscribers</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-warning me-3">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">{{ weekly_views|floatformat:0 }}</h3>
+                    <p class="text-muted mb-0">Weekly Views</p>
+                    <small class="text-info">Last 7 days</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Articles -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-newspaper me-2"></i>Recent Articles
+                </h5>
+                <a href="{% url 'news:admin_articles' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_articles %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for article in recent_articles %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'news:article_detail' article.slug %}" class="text-decoration-none" target="_blank">
+                                        {{ article.title|truncatewords:6 }}
+                                    </a>
+                                </td>
+                                <td>{{ article.author.get_full_name|default:article.author.username }}</td>
+                                <td>
+                                    {% if article.status == 'published' %}
+                                    <span class="badge bg-success badge-status">Published</span>
+                                    {% elif article.status == 'draft' %}
+                                    <span class="badge bg-secondary badge-status">Draft</span>
+                                    {% else %}
+                                    <span class="badge bg-warning badge-status">{{ article.status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ article.view_count }}</td>
+                                <td>{{ article.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-newspaper text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">No articles found</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions & Recent Activity -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'news:admin_article_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create Article
+                    </a>
+                    <a href="{% url 'news:admin_comments' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-comments me-2"></i>Review Comments
+                        {% if pending_comments > 0 %}
+                        <span class="badge bg-warning ms-2">{{ pending_comments }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'news:admin_contacts' %}" class="btn btn-outline-info">
+                        <i class="fas fa-envelope me-2"></i>View Messages
+                        {% if unread_contacts > 0 %}
+                        <span class="badge bg-info ms-2">{{ unread_contacts }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'news:admin_analytics' %}" class="btn btn-outline-success">
+                        <i class="fas fa-chart-line me-2"></i>View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Comments -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-comments me-2"></i>Recent Comments
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_comments %}
+                {% for comment in recent_comments %}
+                <div class="p-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0">{{ comment.author.get_full_name|default:comment.author.username }}</h6>
+                        <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                    </div>
+                    <p class="mb-1 small">{{ comment.content|truncatewords:10 }}</p>
+                    <small class="text-muted">
+                        <a href="{% url 'news:article_detail' comment.article.slug %}" class="text-decoration-none" target="_blank">
+                            {{ comment.article.title|truncatewords:5 }}
+                        </a>
+                    </small>
+                    <div class="mt-2">
+                        {% if comment.is_approved %}
+                        <span class="badge bg-success badge-status">Approved</span>
+                        {% else %}
+                        <span class="badge bg-warning badge-status">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-comments text-muted" style="font-size: 2rem;"></i>
+                    <p class="text-muted mt-2">No comments yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Performance -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Category Performance
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if category_stats %}
+                <div class="row">
+                    {% for category in category_stats %}
+                    <div class="col-md-3 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3" style="width: 12px; height: 12px; background-color: {{ category.color }}; border-radius: 50%;"></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">{{ category.name }}</div>
+                                <small class="text-muted">{{ category.article_count }} articles</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-folder text-muted" style="font-size: 2rem;"></i>
+                    <p class="text-muted mt-2">No categories found</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

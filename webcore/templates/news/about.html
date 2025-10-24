@@ -1,0 +1,148 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+{% block title %}About Us - {{ site_name }}{% endblock %}
+{% block description %}Learn more about our news website, our mission, and the team behind the stories that matter.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">About {{ site_name }}</h1>
+            <p class="lead">We are committed to delivering accurate, timely, and comprehensive news coverage that keeps you informed about the world around you.</p>
+        </div>
+        <div class="col-lg-6 text-center">
+            <i class="fas fa-newspaper text-primary" style="font-size: 8rem; opacity: 0.3;"></i>
+        </div>
+    </div>
+    
+    <!-- Mission Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-5">
+                    <h2 class="fw-bold mb-4 text-center">Our Mission</h2>
+                    <p class="text-center lead">To provide reliable, unbiased news coverage that empowers our readers to make informed decisions and stay connected to the world around them.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Values Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="fw-bold mb-4 text-center">Our Values</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-shield-alt text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Integrity</h5>
+                    <p class="card-text">We maintain the highest standards of journalistic integrity and ethical reporting.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-balance-scale text-success mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Accuracy</h5>
+                    <p class="card-text">We verify facts and provide accurate, well-researched information to our readers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-users text-warning mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Community</h5>
+                    <p class="card-text">We foster a community where diverse voices and perspectives are heard and respected.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Team Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="fw-bold mb-4 text-center">Our Team</h2>
+            <p class="text-center text-muted mb-5">Meet the dedicated professionals behind our news coverage</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <img src="{% static 'images/default-avatar.svg' %}" alt="Team Member" class="rounded-circle mb-3" width="100" height="100">
+                    <h5 class="card-title">Sarah Johnson</h5>
+                    <p class="text-muted">Editor-in-Chief</p>
+                    <p class="card-text small">With over 15 years of experience in journalism, Sarah leads our editorial team and ensures the highest quality of reporting.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <img src="{% static 'images/default-avatar.svg' %}" alt="Team Member" class="rounded-circle mb-3" width="100" height="100">
+                    <h5 class="card-title">Michael Chen</h5>
+                    <p class="text-muted">Technology Reporter</p>
+                    <p class="card-text small">Michael specializes in technology and innovation, bringing deep insights into the latest tech developments.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <img src="{% static 'images/default-avatar.svg' %}" alt="Team Member" class="rounded-circle mb-3" width="100" height="100">
+                    <h5 class="card-title">Emily Rodriguez</h5>
+                    <p class="text-muted">Political Correspondent</p>
+                    <p class="card-text small">Emily covers politics and policy with a focus on local government and community impact.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body p-5">
+                    <h2 class="fw-bold mb-4 text-center">By the Numbers</h2>
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <h3 class="fw-bold">10K+</h3>
+                            <p class="mb-0">Articles Published</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h3 class="fw-bold">50K+</h3>
+                            <p class="mb-0">Monthly Readers</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h3 class="fw-bold">5+</h3>
+                            <p class="mb-0">Years of Service</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h3 class="fw-bold">24/7</h3>
+                            <p class="mb-0">News Coverage</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact CTA -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card text-center">
+                <div class="card-body p-5">
+                    <h2 class="fw-bold mb-3">Get in Touch</h2>
+                    <p class="lead mb-4">Have a story idea, feedback, or questions? We'd love to hear from you.</p>
+                    <a href="{% url 'news:contact' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-envelope me-2"></i>Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

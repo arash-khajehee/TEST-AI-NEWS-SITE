@@ -1,0 +1,233 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block page_title %}Article Management{% endblock %}
+{% block page_description %}Manage your news articles{% endblock %}
+
+{% block content %}
+<!-- Header Actions -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Articles</h4>
+        <p class="text-muted mb-0">Manage your news articles and content</p>
+    </div>
+    <div>
+        <a href="{% url 'news:admin_article_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Create Article
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                    <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                    <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="category" class="form-label">Category</label>
+                <select name="category" id="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="search" class="form-label">Search</label>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search articles..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search me-1"></i>Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bulk Actions -->
+{% if page_obj %}
+<div class="card mb-4">
+    <div class="card-body">
+        <form id="bulkActionsForm" method="post" action="{% url 'news:admin_bulk_actions' %}">
+            {% csrf_token %}
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
+                        <label class="form-check-label" for="selectAll">
+                            Select All
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="action" id="bulkAction" class="form-select">
+                        <option value="">Choose Action</option>
+                        <option value="publish_articles">Publish Selected</option>
+                        <option value="unpublish_articles">Unpublish Selected</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-warning" onclick="submitBulkAction()">
+                        <i class="fas fa-tasks me-1"></i>Apply
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- Articles Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-newspaper me-2"></i>Articles ({{ page_obj.paginator.count }})
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        {% if page_obj %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th width="30">
+                            <input type="checkbox" class="form-check-input" onchange="toggleSelectAll(this)">
+                        </th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Views</th>
+                        <th>Comments</th>
+                        <th>Date</th>
+                        <th width="120">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in page_obj %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selected_items" value="{{ article.id }}" class="form-check-input">
+                        </td>
+                        <td>
+                            <div>
+                                <a href="{% url 'news:article_detail' article.slug %}" class="text-decoration-none fw-bold" target="_blank">
+                                    {{ article.title|truncatewords:8 }}
+                                </a>
+                                {% if article.featured == 'breaking' %}
+                                <span class="badge bg-danger ms-1">Breaking</span>
+                                {% elif article.featured == 'trending' %}
+                                <span class="badge bg-warning ms-1">Trending</span>
+                                {% elif article.featured == 'featured' %}
+                                <span class="badge bg-info ms-1">Featured</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="{% static 'images/default-avatar.svg' %}" alt="Avatar" class="rounded-circle me-2" width="24" height="24">
+                                {{ article.author.get_full_name|default:article.author.username }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge" style="background-color: {{ article.category.color }}; color: white;">
+                                {{ article.category.name }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if article.status == 'published' %}
+                            <span class="badge bg-success badge-status">Published</span>
+                            {% elif article.status == 'draft' %}
+                            <span class="badge bg-secondary badge-status">Draft</span>
+                            {% else %}
+                            <span class="badge bg-warning badge-status">{{ article.status|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark">{{ article.view_count }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark">{{ article.comments.count }}</span>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ article.created_at|date:"M d, Y" }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'news:admin_article_edit' article.id %}" class="btn btn-outline-primary btn-sm" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'news:article_detail' article.slug %}" class="btn btn-outline-info btn-sm" title="View" target="_blank">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'news:admin_article_delete' article.id %}" class="btn btn-outline-danger btn-sm btn-delete" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer">
+            <nav aria-label="Article pagination">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if status_filter %}status={{ status_filter }}&{% endif %}{% if category_filter %}category={{ category_filter }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page=1">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if status_filter %}status={{ status_filter }}&{% endif %}{% if category_filter %}category={{ category_filter }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if status_filter %}status={{ status_filter }}&{% endif %}{% if category_filter %}category={{ category_filter }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if status_filter %}status={{ status_filter }}&{% endif %}{% if category_filter %}category={{ category_filter }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-newspaper text-muted" style="font-size: 4rem;"></i>
+            <h4 class="text-muted mt-3">No articles found</h4>
+            <p class="text-muted">Create your first article to get started.</p>
+            <a href="{% url 'news:admin_article_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Article
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+

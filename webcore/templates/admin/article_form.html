@@ -1,0 +1,258 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_description %}{{ action }} article content{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>{{ title }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">Title *</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                <div class="text-danger small">{{ form.category.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.excerpt.id_for_label }}" class="form-label">Excerpt</label>
+                        {{ form.excerpt }}
+                        <div class="form-text">Brief description of the article (optional)</div>
+                        {% if form.excerpt.errors %}
+                        <div class="text-danger small">{{ form.excerpt.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">Content *</label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                        <div class="text-danger small">{{ form.content.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.featured_image.id_for_label }}" class="form-label">Featured Image</label>
+                                {{ form.featured_image }}
+                                {% if form.featured_image.errors %}
+                                <div class="text-danger small">{{ form.featured_image.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.featured_image_alt.id_for_label }}" class="form-label">Image Alt Text</label>
+                                {{ form.featured_image_alt }}
+                                {% if form.featured_image_alt.errors %}
+                                <div class="text-danger small">{{ form.featured_image_alt.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                <div class="text-danger small">{{ form.status.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+                                {{ form.tags }}
+                                {% if form.tags.errors %}
+                                <div class="text-danger small">{{ form.tags.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.meta_description.id_for_label }}" class="form-label">Meta Description</label>
+                                {{ form.meta_description }}
+                                <div class="form-text">SEO meta description (160 characters max)</div>
+                                {% if form.meta_description.errors %}
+                                <div class="text-danger small">{{ form.meta_description.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.meta_keywords.id_for_label }}" class="form-label">Meta Keywords</label>
+                                {{ form.meta_keywords }}
+                                <div class="form-text">Keywords separated by commas</div>
+                                {% if form.meta_keywords.errors %}
+                                <div class="text-danger small">{{ form.meta_keywords.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'news:admin_articles' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Articles
+                        </a>
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{{ action }} Article
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Article Preview -->
+        {% if article %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-eye me-2"></i>Article Preview
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'news:article_detail' article.slug %}" class="btn btn-outline-primary btn-sm" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i>View Article
+                    </a>
+                </div>
+                <hr>
+                <div class="small text-muted">
+                    <div class="d-flex justify-content-between">
+                        <span>Views:</span>
+                        <span>{{ article.view_count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Comments:</span>
+                        <span>{{ article.comments.count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Shares:</span>
+                        <span>{{ article.share_count }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Publishing Tips -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>Publishing Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Use descriptive titles that capture attention
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Write engaging excerpts to encourage clicks
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Add relevant tags for better discoverability
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Use high-quality featured images
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Optimize meta descriptions for SEO
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Character counter for meta description
+document.addEventListener('DOMContentLoaded', function() {
+    const metaDescField = document.getElementById('{{ form.meta_description.id_for_label }}');
+    if (metaDescField) {
+        const counter = document.createElement('small');
+        counter.className = 'text-muted';
+        counter.style.display = 'block';
+        metaDescField.parentNode.appendChild(counter);
+        
+        function updateCounter() {
+            const length = metaDescField.value.length;
+            counter.textContent = `${length}/160 characters`;
+            if (length > 160) {
+                counter.className = 'text-danger';
+            } else if (length > 140) {
+                counter.className = 'text-warning';
+            } else {
+                counter.className = 'text-muted';
+            }
+        }
+        
+        metaDescField.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+});
+
+// Auto-save draft functionality
+let autoSaveTimeout;
+document.querySelectorAll('input, textarea, select').forEach(function(field) {
+    field.addEventListener('input', function() {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(function() {
+            // Auto-save logic can be implemented here
+            console.log('Auto-saving draft...');
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}
+
+
+

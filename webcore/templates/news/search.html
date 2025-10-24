@@ -1,0 +1,270 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+{% block title %}Search - {{ site_name }}{% endblock %}
+{% block description %}Search for articles, news, and content. Find the latest updates and stories that matter to you.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Search Header -->
+            <div class="text-center mb-5">
+                <h1 class="fw-bold mb-3">
+                    <i class="fas fa-search text-primary me-2"></i>Search Articles
+                </h1>
+                <p class="text-muted">Find the latest news and stories that interest you</p>
+            </div>
+            
+            <!-- Advanced Search Form -->
+            <div class="card mb-5">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Advanced Search
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'news:search' %}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="query" class="form-label">Search Term</label>
+                                <input type="text" name="q" id="query" class="form-control" placeholder="Enter keywords..." value="{{ request.GET.q }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select name="category" id="category" class="form-select">
+                                    <option value="">All Categories</option>
+                                    {% for category in search_form.category.field.queryset %}
+                                    <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="date_from" class="form-label">From Date</label>
+                                <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request.GET.date_from }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="date_to" class="form-label">To Date</label>
+                                <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request.GET.date_to }}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tags</label>
+                            <div class="row">
+                                {% for tag in search_form.tags.field.queryset %}
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="tags" value="{{ tag.id }}" id="tag_{{ tag.id }}" 
+                                               {% if tag.id|stringformat:"s" in request.GET.tags %}checked{% endif %}>
+                                        <label class="form-check-label" for="tag_{{ tag.id }}">
+                                            {{ tag.name }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                            <a href="{% url 'news:search' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Search Results -->
+            {% if request.GET.q or request.GET.category or request.GET.tags or request.GET.date_from or request.GET.date_to %}
+            <div class="mb-4">
+                <h3 class="fw-bold">
+                    Search Results
+                    <span class="badge bg-primary ms-2">{{ articles|length }} result{{ articles|length|pluralize }}</span>
+                </h3>
+                
+                {% if request.GET.q %}
+                <p class="text-muted">Searching for: "<strong>{{ request.GET.q }}</strong>"</p>
+                {% endif %}
+            </div>
+            
+            {% if articles %}
+            <div class="row">
+                {% for article in articles %}
+                <div class="col-md-6 mb-4">
+                    <article class="card h-100 shadow-sm article-card">
+                        {% if article.featured_image %}
+                        <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.featured_image_alt|default:article.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-2">
+                                <span class="badge bg-{{ article.category.color|default:'primary' }} me-2">{{ article.category.name }}</span>
+                                {% if article.featured == 'breaking' %}
+                                <span class="badge bg-danger">Breaking</span>
+                                {% elif article.featured == 'trending' %}
+                                <span class="badge bg-warning">Trending</span>
+                                {% elif article.featured == 'featured' %}
+                                <span class="badge bg-info">Featured</span>
+                                {% endif %}
+                            </div>
+                            
+                            <h5 class="card-title">
+                                <a href="{% url 'news:article_detail' article.slug %}" class="text-decoration-none text-dark">
+                                    {{ article.title }}
+                                </a>
+                            </h5>
+                            
+                            <p class="card-text text-muted flex-grow-1">{{ article.excerpt|truncatewords:20 }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <div class="d-flex align-items-center">
+                                    <img src="{% static 'images/default-avatar.svg' %}" alt="Avatar" class="rounded-circle me-2" width="30" height="30">
+                                    <div>
+                                        <small class="text-muted d-block">{{ article.author.get_full_name|default:article.author.username }}</small>
+                                        <small class="text-muted">{{ article.published_at|date:"M d, Y" }}</small>
+                                    </div>
+                                </div>
+                                <div class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>{{ article.view_count }}
+                                    <i class="fas fa-comment ms-2 me-1"></i>{{ article.comments.count }}
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Search pagination" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">No results found</h4>
+                <p class="text-muted">Try adjusting your search criteria or browse our categories.</p>
+                <a href="{% url 'news:article_list' %}" class="btn btn-primary">Browse All Articles</a>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">Start Your Search</h4>
+                <p class="text-muted">Use the search form above to find articles that interest you.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Search -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Search
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'news:search' %}">
+                        <div class="mb-3">
+                            <input type="text" name="q" class="form-control" placeholder="Search articles..." value="{{ request.GET.q }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Popular Searches -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-fire me-2"></i>Popular Searches
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="?q=technology" class="badge bg-light text-dark text-decoration-none">Technology</a>
+                        <a href="?q=politics" class="badge bg-light text-dark text-decoration-none">Politics</a>
+                        <a href="?q=sports" class="badge bg-light text-dark text-decoration-none">Sports</a>
+                        <a href="?q=health" class="badge bg-light text-dark text-decoration-none">Health</a>
+                        <a href="?q=business" class="badge bg-light text-dark text-decoration-none">Business</a>
+                        <a href="?q=entertainment" class="badge bg-light text-dark text-decoration-none">Entertainment</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categories -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-folder me-2"></i>Browse by Category
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for category in categories %}
+                    <a href="{% url 'news:category_detail' category.slug %}" class="d-flex justify-content-between align-items-center text-decoration-none text-dark mb-2">
+                        <span>
+                            <span class="badge bg-{{ category.color|default:'primary' }} me-2" style="width: 12px; height: 12px; border-radius: 50%;"></span>
+                            {{ category.name }}
+                        </span>
+                        <span class="badge bg-light text-dark">{{ category.article_count }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

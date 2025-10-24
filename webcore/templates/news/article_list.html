@@ -1,0 +1,242 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+{% block title %}Articles - {{ site_name }}{% endblock %}
+{% block description %}Browse all articles and news stories. Find the latest updates, trending topics, and in-depth coverage.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-2">All Articles</h1>
+                    <p class="text-muted">Discover the latest news and stories</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-filter me-1"></i>Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?">All Articles</a></li>
+                            <li><a class="dropdown-item" href="?featured=trending">Trending</a></li>
+                            <li><a class="dropdown-item" href="?featured=breaking">Breaking News</a></li>
+                            <li><a class="dropdown-item" href="?featured=featured">Featured</a></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-sort me-1"></i>Sort
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?sort=newest">Newest First</a></li>
+                            <li><a class="dropdown-item" href="?sort=oldest">Oldest First</a></li>
+                            <li><a class="dropdown-item" href="?sort=popular">Most Popular</a></li>
+                            <li><a class="dropdown-item" href="?sort=trending">Most Viewed</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search Results Info -->
+            {% if request.GET.q %}
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-search me-2"></i>
+                Search results for "<strong>{{ request.GET.q }}</strong>" - {{ articles|length }} article{{ articles|length|pluralize }} found
+            </div>
+            {% endif %}
+            
+            <!-- Articles Grid -->
+            {% if articles %}
+            <div class="row">
+                {% for article in articles %}
+                <div class="col-md-6 mb-4">
+                    <article class="card h-100 shadow-sm article-card">
+                        {% if article.featured_image %}
+                        <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.featured_image_alt|default:article.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-2">
+                                <span class="badge bg-{{ article.category.color|default:'primary' }} me-2">{{ article.category.name }}</span>
+                                {% if article.featured == 'breaking' %}
+                                <span class="badge bg-danger">Breaking</span>
+                                {% elif article.featured == 'trending' %}
+                                <span class="badge bg-warning">Trending</span>
+                                {% elif article.featured == 'featured' %}
+                                <span class="badge bg-info">Featured</span>
+                                {% endif %}
+                            </div>
+                            
+                            <h5 class="card-title">
+                                <a href="{% url 'news:article_detail' article.slug %}" class="text-decoration-none text-dark">
+                                    {{ article.title }}
+                                </a>
+                            </h5>
+                            
+                            <p class="card-text text-muted flex-grow-1">{{ article.excerpt|truncatewords:20 }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <div class="d-flex align-items-center">
+                                    <img src="{% static 'images/default-avatar.svg' %}" alt="Avatar" class="rounded-circle me-2" width="30" height="30">
+                                    <div>
+                                        <small class="text-muted d-block">{{ article.author.get_full_name|default:article.author.username }}</small>
+                                        <small class="text-muted">{{ article.published_at|date:"M d, Y" }}</small>
+                                    </div>
+                                </div>
+                                <div class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>{{ article.view_count }}
+                                    <i class="fas fa-comment ms-2 me-1"></i>{{ article.comments.count }}
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Article pagination" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page=1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.paginator.num_pages }}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-newspaper text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">No articles found</h4>
+                <p class="text-muted">
+                    {% if request.GET.q %}
+                    Try adjusting your search terms or browse our categories.
+                    {% else %}
+                    Check back later for new content!
+                    {% endif %}
+                </p>
+                {% if request.GET.q %}
+                <a href="{% url 'news:article_list' %}" class="btn btn-primary">View All Articles</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>Search Articles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'news:search' %}">
+                        <div class="mb-3">
+                            <input type="text" name="q" class="form-control" placeholder="Search articles..." value="{{ request.GET.q }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Categories -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-folder me-2"></i>Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for category in categories %}
+                    <a href="{% url 'news:category_detail' category.slug %}" class="d-flex justify-content-between align-items-center text-decoration-none text-dark mb-2">
+                        <span>
+                            <span class="badge bg-{{ category.color|default:'primary' }} me-2" style="width: 12px; height: 12px; border-radius: 50%;"></span>
+                            {{ category.name }}
+                        </span>
+                        <span class="badge bg-light text-dark">{{ category.article_count }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Popular Tags -->
+            {% if tags %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tags me-2"></i>Popular Tags
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for tag in tags %}
+                    <a href="{% url 'news:tag_detail' tag.slug %}" class="badge bg-light text-dark text-decoration-none me-2 mb-2">{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Newsletter Signup -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>Stay Updated
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Get the latest articles delivered to your inbox.</p>
+                    <form method="post" action="{% url 'news:newsletter' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="email" name="email" class="form-control" placeholder="Your email address" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
