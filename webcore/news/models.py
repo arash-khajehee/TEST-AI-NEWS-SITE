@@ -12,7 +12,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField(blank=True)
-    color = models.CharField(max_length=7, default='#007bff', help_text='Hex color code')
+    color = models.CharField(max_length=7, default="#ccff00", help_text='Hex color code')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
