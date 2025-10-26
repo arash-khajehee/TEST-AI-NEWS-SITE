@@ -5,7 +5,7 @@ from .models import Article, Comment, ContactMessage, Newsletter, UserProfile, C
 
 
 class CustomUserCreationForm(UserCreationForm):
-    """Custom user registration form with additional fields"""
+    """Custom user registration form with additional fields  """
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
@@ -36,7 +36,7 @@ class UserProfileForm(forms.ModelForm):
             'location': forms.TextInput(attrs={'class': 'form-control'}),
             'birth_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'twitter_handle': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '@username'}),
-            'linkedin_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://linkedin.com/in/username'}),
+            'linkedin_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://linkedin.com/in/username1'}),
         }
 
 
