@@ -20,7 +20,7 @@ def is_admin(user):
 
 @staff_member_required
 def admin_dashboard(request):
-    """Custom admin dashboard with statistics and quick actions"""
+    """Custom admin dashboard with statistics and quick actions . """
     
     # Get statistics
     total_articles = Article.objects.count()
